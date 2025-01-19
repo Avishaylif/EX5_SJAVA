@@ -68,7 +68,8 @@ public class Variables {
         this.booleanVariables = new ArrayList<>();
         this.charVariables = new ArrayList<>();
         sortVariables();
-        return validIntVariables() && validDoubleVariables() && validStringVariables() && validBooleanVariables() && validCharVariables() && validFinalVariables();
+        return validIntVariables() && validDoubleVariables() && validStringVariables() &&
+        validBooleanVariables() && validCharVariables() && validFinalVariables() && duplicateVariableName();
     }
 
 
@@ -167,6 +168,10 @@ public class Variables {
                 return false;
             }
         }
+        return true;
+    }
+
+    public boolean duplicateVariableName() {
         return true;
     }
 }
