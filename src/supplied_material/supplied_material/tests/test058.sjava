@@ -1,1 +1,5 @@
-int a = 3 - 5;
+int a = 521;
+String b;
+
+a = 832;
+a = 1, b = "hi";

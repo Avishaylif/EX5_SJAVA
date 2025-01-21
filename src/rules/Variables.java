@@ -29,7 +29,10 @@ public class Variables {
     private static final String CHAR_VARIABLE =
             "^(final\\s*)?(char)\\s+([a-zA-Z_][a-zA-Z0-9_]*)(\\s*=\\s*'[^\n']{1}'|\\s*)(" +
                     "(\\s*,\\s*[a-zA-Z_][a-zA-Z0-9_]*\\s*(=\\s*'[^\n']{1}')*\\s*)*)\\s*;$";
+
     private static final String FINAL_VARIABLE = "^\\s*final\\b.*";
+
+    private static final String VALID_ASSIGMENT = "(\\b[a-zA-Z_][a-zA-Z0-9_]*\\b)(\\s*=\\s*[^,;]*)?";
 
 
     //List for each type of variable
@@ -180,13 +183,15 @@ public class Variables {
                 if(line.contains(var)){
                     count++;
                     if (count > 1) {
+                        System.out.println(count);
+                        System.out.println(var);
                         System.out.println("Duplicate assignment for final var error");
                         return false;
                     }
                 }
             }
         }
-        return true;
+        return hasAssignmentForAllVariables(String.valueOf(finalVariables));
     }
 
     private static List<String> extractVariableNames(String line) {
@@ -208,6 +213,19 @@ public class Variables {
             insideAssignment = line.charAt(matcher.end()) == '=';
         }
         return variableNames;
+    }
+
+    private static boolean hasAssignmentForAllVariables(String line) {
+        Pattern pattern = Pattern.compile(VALID_ASSIGMENT);
+        Matcher matcher = pattern.matcher(line);
+
+        while (matcher.find()) {
+            if (matcher.group(2) == null) {
+                System.out.println("Missing assignment for final var error");
+                return false;
+            }
+        }
+        return true;
     }
 
 }
