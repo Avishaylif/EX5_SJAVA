@@ -1,9 +1,1 @@
-int a = 0 ,  b;
-double c = 0.0 , d;
-String e = "Hello" ;
-char g = 't';
-final int i = 0 , j;
-final double k = 0.0 , l;
-boolean a, b ,c , d = true, e, f = 5;
-char c='Z', f;
-String a = "hello" , b = "goodbye";
+int a = 3 - 5;

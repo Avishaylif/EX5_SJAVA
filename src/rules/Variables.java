@@ -7,6 +7,8 @@ import java.util.regex.Pattern;
 
 public class Variables {
     //constants
+
+    //regex for type var of S-JAVA(int, double, String, boolean, char)
     private static final String INT_VARIABLE =
             "^(final\\s*)?(int)\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\s" +
                     "*(=\\s*[+-]?\\d+)?(\\s*,\\s*[a-zA-Z_][a-zA-Z0-9_]*\\s*(=\\s*[+-]?\\d+)?)*\\s*;$";
@@ -27,16 +29,10 @@ public class Variables {
     private static final String CHAR_VARIABLE =
             "^(final\\s*)?(char)\\s+([a-zA-Z_][a-zA-Z0-9_]*)(\\s*=\\s*'[^\n']{1}'|\\s*)(" +
                     "(\\s*,\\s*[a-zA-Z_][a-zA-Z0-9_]*\\s*(=\\s*'[^\n']{1}')*\\s*)*)\\s*;$";
-
-
-
-
-
     private static final String FINAL_VARIABLE = "^\\s*final\\b.*";
 
-    private static final String FINAL_NAME_VARIABLE = "\\bfinal\\s+\\w+\\s+(\\w+)";
 
-
+    //List for each type of variable
     private static final String VARIABLE_TYPE = "^(final|int|double|String|boolean|char)\\b.*";
     private List<String> variablesLines;
     private List<String> finalVariables = new ArrayList<>();
@@ -51,6 +47,11 @@ public class Variables {
     public Variables() {
     }
 
+    /**
+     * Check if the variables in the file are valid
+     * @param lines
+     * @return true if the variables are valid
+     */
     public boolean Variables(List<String> lines) {
         List<String> variablesLines = new ArrayList<>();
         Pattern pattern = Pattern.compile(VARIABLE_TYPE);
@@ -73,7 +74,7 @@ public class Variables {
     }
 
 
-    public void sortVariables() {
+    private void sortVariables() {
         for (String line : variablesLines) {
             if (line.contains("final")) {
                 finalVariables.add(line);
@@ -92,7 +93,7 @@ public class Variables {
         }
     }
 
-    public boolean validIntVariables() {
+    private boolean validIntVariables() {
         for (String line : intVariables) {
             //syntax check
             Pattern pattern = Pattern.compile(INT_VARIABLE);
@@ -106,7 +107,7 @@ public class Variables {
         return true;
     }
 
-    public boolean validDoubleVariables() {
+    private boolean validDoubleVariables() {
         for (String line : doubleVariables) {
             // syntax check
             Pattern pattern = Pattern.compile(DOUBLE_VARIABLE);
@@ -119,7 +120,7 @@ public class Variables {
         return true;
     }
 
-    public boolean validStringVariables() {
+    private boolean validStringVariables() {
         for (String line : stringVariables) {
             // syntax check
             Pattern pattern = Pattern.compile(STRING_VARIABLE);
@@ -132,7 +133,7 @@ public class Variables {
         return true;
     }
 
-    public boolean validBooleanVariables() {
+    private boolean validBooleanVariables() {
         for (String line : booleanVariables) {
             // syntax check
             Pattern pattern = Pattern.compile(BOOLEAN_VARIABLE);
@@ -145,7 +146,7 @@ public class Variables {
         return true;
     }
 
-    public boolean validCharVariables() {
+    private boolean validCharVariables() {
         for (String line : charVariables) {
             // syntax check
             Pattern pattern = Pattern.compile(CHAR_VARIABLE);
@@ -158,7 +159,7 @@ public class Variables {
         return validFinalVariables();
     }
 
-    public boolean validFinalVariables() {
+    private boolean validFinalVariables() {
         for (String line : finalVariables) {
             // syntax check
             Pattern pattern = Pattern.compile(FINAL_VARIABLE);
@@ -171,8 +172,43 @@ public class Variables {
         return true;
     }
 
-    public boolean duplicateVariableName() {
+    private boolean duplicateVariableName() {
+        List<String> variableNames = extractVariableNames(String.valueOf(finalVariables));
+        for (String var: variableNames) {
+            int count = 0;
+            for(String line: variablesLines){
+                if(line.contains(var)){
+                    count++;
+                    if (count > 1) {
+                        System.out.println("Duplicate assignment for final var error");
+                        return false;
+                    }
+                }
+            }
+        }
         return true;
     }
+
+    private static List<String> extractVariableNames(String line) {
+        List<String> variableNames = new ArrayList<>();
+        Pattern pattern = Pattern.compile("\\b[a-zA-Z_][a-zA-Z0-9_]*\\b");
+        Matcher matcher = pattern.matcher(line);
+        boolean insideAssignment = false;
+        while (matcher.find()) {
+            String match = matcher.group();
+            if ("final".equals(match) || "int".equals(match) || "double".equals(match) ||
+                    "String".equals(match) || "boolean".equals(match) || "char".equals(match)) {
+                continue;
+            }
+            if (insideAssignment && "=".equals(line.substring(matcher.start() - 1, matcher.start()).trim())) {
+                insideAssignment = false;
+                continue;
+            }
+            variableNames.add(match);
+            insideAssignment = line.charAt(matcher.end()) == '=';
+        }
+        return variableNames;
+    }
+
 }
 

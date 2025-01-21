@@ -28,7 +28,7 @@ public class SJavaFileParser {
             String line;
             while ((line = reader.readLine()) != null) {
                if(relevantLine(line))
-               {lines.add(line);}
+               {lines.add(deleteEscape(line));}
             }
         }
         return lines;
@@ -39,7 +39,7 @@ public class SJavaFileParser {
      * @param line
      * @return true if the line is relevant
      */
-    public static boolean relevantLine(String line) {
+    private static boolean relevantLine(String line) {
         if (line.isEmpty()) return false;
         if (line.startsWith("//")) return false;
         if (line.matches(INVALID_COMMENT)) {
@@ -53,6 +53,14 @@ public class SJavaFileParser {
 
         return true;
     }
+
+    /**
+     * Delete escape characters from the line
+     * @param line
+     * @return line without escape characters
+     */
+    private static String deleteEscape(String line) {
+        return line.replaceAll("\\s+", " ");    }
 
 
 }
