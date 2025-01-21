@@ -228,5 +228,18 @@ public class Variables {
         return true;
     }
 
+    public boolean hasAssignmentForAllVariables(List<String> lines) {
+        for (String line : lines) {
+            Pattern pattern = Pattern.compile(VALID_ASSIGMENT);
+            Matcher matcher = pattern.matcher(line);
+            if (!matcher.find()) {
+                System.out.println("Missing assignment for final var error");
+                return false;
+            }
+        }
+        return true;
+    }
+
+
 }
 
