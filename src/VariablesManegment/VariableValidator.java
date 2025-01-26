@@ -314,6 +314,17 @@ public class VariableValidator {
         }
 
         // Assume the value is a literal and parse accordingly
+        return validateInputParameterType(valueStr, targetType);
+    }
+
+    /**
+     * get the value of the new paremeter, and check if it fits the parameter type.
+     * @param valueStr
+     * @param targetType
+     * @return Object
+     * @throws ValidationException
+     */
+    private static Object validateInputParameterType(String valueStr, Type targetType) throws ValidationException {
         switch (targetType) {
             case INT:
                 // Expecting an integer literal
