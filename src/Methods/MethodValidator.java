@@ -11,6 +11,7 @@ import java.util.Map;
 
 public class MethodValidator {
 
+
     // מפה של שם-מתודה -> אובייקט MethodData (או מבנה דומה),
     // כדי שנוכל לאתר פרמטרים/גוף לפי שם המתודה.
     private final Map<String, MethodData> methods;
