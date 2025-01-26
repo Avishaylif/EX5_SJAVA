@@ -3,7 +3,27 @@ package Methods;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * A parser class that analyzes a list of method lines and classifies them into different types.
+ * The class uses regular expressions to identify various elements of a method such as variable declarations, assignments,
+ * function calls, conditional statements, and return statements.
+ *
+ * <p>The parser can identify and classify the following types of lines:
+ * <ul>
+ *   <li>VARIABLE_DECLARATION - A line that declares a variable.</li>
+ *   <li>VARIABLE_ASSIGNMENT - A line that assigns a value to a variable.</li>
+ *   <li>FUNCTION_CALL - A line that represents a function call.</li>
+ *   <li>CONDITION_START - A line that starts a conditional block (if/while).</li>
+ *   <li>END_BLOCK - A line that ends a block of code (typically denoted by '}').</li>
+ *   <li>RETURN_STATEMENT - A line that contains a return statement.</li>
+ * </ul>
+ *
+ * <p>Usage:
+ * <pre>
+ * MethodParser parser = new MethodParser();
+ * List<LineType> lineTypes = parser.parseMethod(methodLines);
+ * </pre>
+ */
 public class MethodParser {
 
     // Regular expressions for line types
@@ -14,6 +34,9 @@ public class MethodParser {
     private static final String END_BLOCK = "^\\}\\s*$";
     private static final String RETURN_STATEMENT = "^return;$";
 
+    /**
+     * Enum representing different types of lines that can be encountered in a method.
+     */
     public enum LineType {
         VARIABLE_DECLARATION,
         VARIABLE_ASSIGNMENT,
@@ -23,7 +46,13 @@ public class MethodParser {
         RETURN_STATEMENT
     }
 
-    // Parse the lines of a method
+    /**
+     * Parses a list of method lines and classifies them into different line types.
+     *
+     * @param methodLines A list of strings, each representing a line of code in a method.
+     * @return A list of {@link LineType} corresponding to the type of each line in the input.
+     * @throws IllegalStateException if the second-to-last line is not a valid return statement.
+     */
     public List<LineType> parseMethod(List<String> methodLines) {
         List<LineType> lineTypes = new ArrayList<>();
 
@@ -41,8 +70,13 @@ public class MethodParser {
         return lineTypes;
     }
 
-    // Classify a single line
-    private LineType classifyLine(String line) {
+    /**
+     * Classifies a single line of code into one of the predefined {@link LineType}s based on regular expression matching.
+     *
+     * @param line A single line of code to classify.
+     * @return The corresponding {@link LineType} for the given line.
+     * @throws IllegalStateException if the line does not match any of the recognized patterns.
+     */    private LineType classifyLine(String line) {
         if (line.matches(VARIABLE_DECLARATION)) {
             return LineType.VARIABLE_DECLARATION;
         } else if (line.matches(VARIABLE_ASSIGNMENT)) {
