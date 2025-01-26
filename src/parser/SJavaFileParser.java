@@ -62,5 +62,9 @@ public class SJavaFileParser {
     private static String deleteEscape(String line) {
         return line.replaceAll("\\s+", " ");    }
 
+    public static void main(String[] args) {
+
+    }
+
 
 }
