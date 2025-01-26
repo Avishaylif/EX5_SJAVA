@@ -1,4 +1,5 @@
     package VariablesManegment;
+import errors.ValidationException;
 
     /**
      * Represents a variable with a name, type, value, and scope information.
@@ -57,10 +58,10 @@
          * @param isFinal       {@code true} if the variable is final; {@code false} otherwise
          * @param isInitialized {@code true} if the variable has been initialized; {@code false} otherwise
          * @param value         the value assigned to the variable
-         * @throws VariableValidator.ValidationException if the type string is unknown
+         * @throws ValidationException if the type string is unknown
          */
         public Variable(String name, String typeString, boolean isFinal, boolean isInitialized, Object value)
-                throws VariableValidator.ValidationException {
+                throws ValidationException {
             Type type = parseType(typeString);
             new Variable(name, type,  isFinal,  isInitialized,  value);
         }
@@ -140,9 +141,9 @@
          *
          * @param typeStr the type as a string
          * @return the corresponding {@code Type} enum value
-         * @throws VariableValidator.ValidationException if the type string is unknown
+         * @throws ValidationException if the type string is unknown
          */
-        public Type parseType(String typeStr) throws VariableValidator.ValidationException {
+        public Type parseType(String typeStr) throws ValidationException {
             switch (typeStr) {
                 case "int":
                     return Type.INT;
@@ -155,7 +156,7 @@
                     case "String":
                         return Type.STRING;
                     default:
-                        throw new VariableValidator.ValidationException("Unknown type: " + typeStr);
+                        throw new ValidationException("Unknown type: " + typeStr);
                 }
 
             }

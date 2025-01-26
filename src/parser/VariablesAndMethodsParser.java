@@ -3,6 +3,7 @@ package parser;
 import Methods.MethodData;
 import VariablesManegment.Variable;
 import VariablesManegment.VariableValidator;
+import errors.ValidationException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,7 +25,7 @@ public class VariablesAndMethodsParser {
 
 
     // Parse lines and separate global variables and methods
-    public void parseLines(List<String> lines) throws VariableValidator.ValidationException {
+    public void parseLines(List<String> lines) throws ValidationException {
         boolean inMethod = false;
         int blockDepth = 0;
         String currentMethod = null;
@@ -95,7 +96,7 @@ public class VariablesAndMethodsParser {
     }
 
 
-    public List<Variable> validateAndStoreMethod(String line) throws VariableValidator.ValidationException {
+    public List<Variable> validateAndStoreMethod(String line) throws ValidationException {
         Pattern pattern = Pattern.compile(METHOD_DEFINITION);
         Matcher matcher = pattern.matcher(line);
 

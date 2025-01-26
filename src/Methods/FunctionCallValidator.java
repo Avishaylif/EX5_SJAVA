@@ -2,6 +2,7 @@ package Methods;
 
 import VariablesManegment.Variable;
 import VariablesManegment.VariableValidator;
+import errors.ValidationException;
 
 import java.util.List;
 import java.util.Map;
@@ -17,7 +18,7 @@ public class FunctionCallValidator {
     }
 
     // Validate a function call
-    public void validateFunctionCall(String functionName, String arguments) throws VariableValidator.ValidationException {
+    public void validateFunctionCall(String functionName, String arguments) throws ValidationException {
         MethodData methodData = methods.get(functionName);
         if (methodData==null) {
             throw new IllegalStateException("Function not found: " + functionName);

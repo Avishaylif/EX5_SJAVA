@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.regex.*;
 
 import VariablesManegment.Variable.Type;
+import errors.ValidationException;
 
 /**
  * Validates and manages variable declarations and assignments within different scopes.
@@ -403,19 +404,8 @@ public class VariableValidator {
         }
     }
 
-    /**
-     * Exception class representing validation errors during variable processing.
-     */
-    public static class ValidationException extends Exception {
-        /**
-         * Constructs a new {@code ValidationException} with the specified detail message.
-         *
-         * @param message the detail message explaining the validation error
-         */
-        public ValidationException(String message) {
-            super(message);
-        }
-    }
+
+
 
 }
 
