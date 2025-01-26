@@ -105,6 +105,7 @@ public class VariablesAndMethodsParser {
             String parameters = matcher.group(2);
 
             // Validate method name
+            //todo: check if number are valid in method name, amf if this checking is necessary at all
             if (!methodName.matches("[a-zA-Z][a-zA-Z0-9_]*")) {
                 throw new IllegalStateException("Invalid method name: " + methodName);
             }
@@ -117,18 +118,21 @@ public class VariablesAndMethodsParser {
             if (!parameters.isBlank()) {
                 String[] paramArray = parameters.split(",");
                 for (String param : paramArray) {
-                    Matcher paramMatcher = Pattern.compile(PARAMETER_PATTERN).matcher(param.trim());
-                    if (!paramMatcher.find()) {
+                    Matcher parameterMatcher = Pattern.compile(PARAMETER_PATTERN).matcher(param.trim());
+                    if (!parameterMatcher.find()) {
                         //It's failed also at the case "(Parm parm,)"
                         throw new IllegalStateException("Invalid parameter: " + param);
                     }
+                    String finalKeyword = parameterMatcher.group(1);
+                    String type = parameterMatcher.group(2);
+                    String varName = parameterMatcher.group(3);
 
                     Variable parameter = new Variable(
-                            paramMatcher.group(3),
-                            (paramMatcher.group(2)),
-                            paramMatcher.group(1) != null ? true : false,
+                            varName,
+                            type,
+                            finalKeyword != null ? true : false,
                             false,
-                            null);
+                           null);
                     parameterList.add(parameter);
                 }
             }

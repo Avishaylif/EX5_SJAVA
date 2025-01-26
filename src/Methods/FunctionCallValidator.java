@@ -23,7 +23,6 @@ public class FunctionCallValidator {
         if (methodData==null) {
             throw new IllegalStateException("Function not found: " + functionName);
         }
-
         List<Variable> expectedParams = methodData.getMethodParameters();
         String[] providedArgs = arguments.isEmpty() ? new String[0] : arguments.split(",");
 

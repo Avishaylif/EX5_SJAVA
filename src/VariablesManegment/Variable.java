@@ -63,7 +63,11 @@ import errors.ValidationException;
         public Variable(String name, String typeString, boolean isFinal, boolean isInitialized, Object value)
                 throws ValidationException {
             Type type = parseType(typeString);
-            new Variable(name, type,  isFinal,  isInitialized,  value);
+            this.name = name;
+            this.type = type;
+            this.isFinal = isFinal;
+            this.isInitialized = isInitialized;
+            this.value = value;
         }
 
 
