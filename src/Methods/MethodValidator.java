@@ -1,299 +1,208 @@
-package Methods;
+    package Methods;
 
-import Conditions.ConditionValidator;
-import VariablesManegment.SymbolsTable;
-import VariablesManegment.Variable;
-import VariablesManegment.VariableValidator;
-
-
-import java.util.List;
-import java.util.Map;
-
-public class MethodValidator {
+    import Conditions.ConditionValidator;
+    import VariablesManegment.SymbolsTable;
+    import VariablesManegment.Variable;
+    import VariablesManegment.VariableValidator;
 
 
-    // מפה של שם-מתודה -> אובייקט MethodData (או מבנה דומה),
-    // כדי שנוכל לאתר פרמטרים/גוף לפי שם המתודה.
-    private final Map<String, MethodData> methods;
+    import java.util.List;
+    import java.util.Map;
 
-    private final MethodParser methodParser;
-    private final SymbolsTable symbolsTable;
-    private final FunctionCallValidator functionCallValidator;
-    private final ConditionValidator conditionValidator;
-    private final VariableValidator variableValidator;
-
-    public MethodValidator(Map<String, MethodData> methods,
-                           SymbolsTable symbolsTable,
-                           FunctionCallValidator functionCallValidator,
-                           ConditionValidator conditionValidator,
-                           VariableValidator variableValidator) {
-        this.methodParser = new MethodParser();
-        this.methods = methods;
-        this.symbolsTable = symbolsTable;
-        this.functionCallValidator = functionCallValidator;
-        this.conditionValidator = conditionValidator;
-        this.variableValidator = variableValidator;
-    }
 
     /**
-     * דוגמה לפונקציה שרצה על כל המתודות במפה ומוודאת אותן.
+     * Validates methods by ensuring correct variable declarations, assignments, function calls,
+     * and condition handling within different scopes.
+     *
+     * <p>The {@code MethodValidator} class utilizes various validators and a symbol table to
+     * analyze and validate the structure and content of methods. It processes each method
+     * by opening appropriate scopes, validating parameters, and iterating through each line
+     * of the method body to perform necessary validations.</p>
+     *
      */
-    public void validateAllMethods() throws Exception {
-        for (MethodData methodData : methods.values()) {
-            validateMethod(methodData);
+    public class MethodValidator {
+
+
+        /**
+         * A map associating method names to their corresponding {@link MethodData} objects.
+         * Used to retrieve method parameters and bodies for validation.
+         */
+        private final Map<String, MethodData> methods;
+
+        /** Parser to analyze and categorize lines within method bodies. */
+        private final MethodParser methodParser;
+
+        /** Symbol table managing variable scopes and declarations within methods. */
+        private final SymbolsTable symbolsTable;
+
+        /** Validator for function calls within methods. */
+        private final FunctionCallValidator functionCallValidator;
+        /** Validator for conditions (e.g., if statements) within methods. */
+        private final ConditionValidator conditionValidator;
+
+        /** Validator for variable declarations and assignments within methods. */
+        private final VariableValidator variableValidator;
+
+        /**
+         * Constructs a new {@code MethodValidator} with the specified dependencies.
+         *
+         * @param methods                a map of method names to {@link MethodData} objects
+         * @param symbolsTable           the symbol table managing variable scopes
+         * @param functionCallValidator  the validator for function calls
+         * @param conditionValidator     the validator for conditions
+         * @param variableValidator      the validator for variables
+         */
+        public MethodValidator(Map<String, MethodData> methods,
+                               SymbolsTable symbolsTable,
+                               FunctionCallValidator functionCallValidator,
+                               ConditionValidator conditionValidator,
+                               VariableValidator variableValidator) {
+            this.methodParser = new MethodParser();
+            this.methods = methods;
+            this.symbolsTable = symbolsTable;
+            this.functionCallValidator = functionCallValidator;
+            this.conditionValidator = conditionValidator;
+            this.variableValidator = variableValidator;
         }
-    }
 
-    /**
-     * מוודאת מתודה בודדת:
-     * 1) פתיחת סקופ והוספת הפרמטרים כמשתנים מקומיים.
-     * 2) מעבר שורה-שורה וביצוע הבדיקות הרלוונטיות.
-     */
-    public void validateMethod(MethodData methodData) throws Exception {
-        // 1. פותחים סקופ (עומק 1) עבור הפרמטרים
-        symbolsTable.openScope();
-        // מכניסים את הפרמטרים כמשתנים מקומיים:
-        for (Variable param : methodData.getMethodParameters()) {
-            symbolsTable.addVariable(param);
-            // בהנחה שה-param כבר בנוי נכון (שם, טיפוס, isFinal, isInitialized וכו').
-        }
-
-        // 2. נקבל את גוף המתודה (רשימת שורות) ואת ה-LineTypes שלה (לדוגמה).
-        List<String> body = methodData.getBody();
-        List<MethodParser.LineType> lineTypes = methodParser.parseMethod(body);
-
-        int blockDepth = 1; // מונה לקביעת עומק בלוקים פנימיים
-        for (int i = 0; i < body.size(); i++) {
-            String line = body.get(i).trim();
-            MethodParser.LineType lineType = lineTypes.get(i);
-
-            switch (lineType) {
-                case FUNCTION_CALL:
-                    // מפעילים את הוולידציה של קריאת מתודה
-                    functionCallValidator.validateFunctionCall(extractFunctionName(line), extractArguments(line));
-                    break;
-
-                case CONDITION_START:
-                    // לדוגמה, שורה בסגנון "if (x > 5) {"
-                    // 1) חילוץ הביטוי התנאי
-                    String conditionExpr = extractConditionExpression(line);
-                    // 2) ולידציה שלו
-                    conditionValidator.validateCondition(conditionExpr);
-                    // 3) פתיחת בלוק חדש => openScope
-                    symbolsTable.openScope();
-                    blockDepth++;
-                    break;
-
-                case END_BLOCK:
-                    // סוגרים את הבלוק (בדרך כלל "}")
-                    if (blockDepth == 0) {
-                        throw new Exception("Unmatched closing brace for condition.");
-                    }
-                    symbolsTable.closeScope();
-                    blockDepth--;
-                    break;
-
-                case VARIABLE_DECLARATION:
-                    // נניח שזיהינו שזה הכרזה / השמה באותה קטגוריה
-                    // מפעילים את VariableValidator
-                    // בתוך השיטה הזו נזהה אם זה הכרזה או השמה ונפעל בהתאם
-                    // (כמו handleDeclarationOrAssignment(line, currentScopeDepth)).
-                    variableValidator.handleDeclarationOrAssignment(line);
-                    break;
-                case VARIABLE_ASSIGNMENT:
-                    // נניח שזיהינו שזה הכרזה / השמה באותה קטגוריה
-                    // מפעילים את VariableValidator
-                    // בתוך השיטה הזו נזהה אם זה הכרזה או השמה ונפעל בהתאם
-                    // (כמו handleDeclarationOrAssignment(line, currentScopeDepth)).
-                    variableValidator.handleDeclarationOrAssignment(line);
-                    break;
-                case RETURN_STATEMENT:
-                    break;
-                default:
-                    // שורה לא מוכרת - אולי ריקה, או משהו שנפל בין הכיסאות
-                    // אפשר לזרוק שגיאה או להתעלם
-                    throw new Exception("Unknown or invalid line: " + line);
+        /**
+         * Validates all methods present in the {@code methods} map.
+         *
+         * <p>Iterates through each {@link MethodData} object and invokes {@link #validateMethod(MethodData)}
+         * to perform individual method validations.</p>
+         *
+         * @throws Exception if any method validation fails
+         */
+        public void validateAllMethods() throws Exception {
+            for (MethodData methodData : methods.values()) {
+                validateMethod(methodData);
             }
         }
 
-        // בסוף המתודה, בודקים אם נשארו בלוקים פתוחים
-        if (blockDepth != 0) {
-            throw new Exception("Unclosed block(s) in method: " + methodData.getMethodName());
-        }
-
-    }
-
-
-    // -----------------------------------------------------------
-    // מתודות עזר (Pseudo-code) לחילוץ מידע מהשורות
-    // -----------------------------------------------------------
-
-
-    private String extractFunctionName(String line) {
-        // בהנחה שה-MethodParser כבר בדק שזה תקין,
-        // נחפש '('
-        int idx = line.indexOf('(');
-        if (idx < 0) return line;
-        return line.substring(0, idx).trim();
-    }
-
-
-
-    private String extractArguments(String line) {
-        // "foo(1,2)" -> מחזיר "1,2"
-        int start = line.indexOf("(");
-        int end = line.lastIndexOf(")");
-        if (start < 0 || end < 0 || end <= start) return "";
-        return line.substring(start + 1, end).trim();
-    }
-
-    private String extractConditionExpression(String line) {
-        // לדוגמה: "if (x > 5) {"
-        // נחפש מה שבין הסוגריים העגולים
-        int open = line.indexOf("(");
-        int close = line.lastIndexOf(")");
-        if (open < 0 || close < 0 || close <= open) {
-            return ""; // או זרוק שגיאה
-        }
-        return line.substring(open + 1, close).trim();
-    }
-}
-
-
-/** old version
-package Methods;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-
-public class MethodValidator {
-
-    private final Map<String, List<Map<String, String>>> methods; // Methods and their parameters
-    private final Stack<Map<String, String>> variableScopes; // Stack to manage variable scopes
-
-    public MethodValidator(Map<String, List<Map<String, String>>> methods) {
-        this.methods = methods;
-        this.variableScopes = new Stack<>();
-    }
-
-    public void validateMethod(List<String> methodLines, List<MethodParser.LineType> lineTypes, List<Map<String, String>> parameters) {
-        int blockDepth = 0;
-
-        // Add the method's parameters to the first scope
-        Map<String, String> methodScope = new HashMap<>();
-        for (Map<String, String> param : parameters) {
-            String paramName = param.get("name");
-            String paramType = param.get("type");
-            if (methodScope.containsKey(paramName)) {
-                throw new IllegalStateException("Duplicate parameter name in method: " + paramName); //todo: check
-            }
-            methodScope.put(paramName, paramType);
-        }
-        variableScopes.push(methodScope);
-
-        for (int i = 0; i < methodLines.size(); i++) {
-            String line = methodLines.get(i).trim();
-            MethodParser.LineType lineType = lineTypes.get(i);
-
-            switch (lineType) {
-                case FUNCTION_CALL:
-                    validateFunctionCall(line);
-                    break;
-                case VARIABLE_ASSIGNMENT:
-                    validateVariableAssignment(line);
-                    break;
-                case VARIABLE_DECLARATION:
-                    validateVariableDeclaration(line);
-                    break;
-                case START_BLOCK:
-                    blockDepth++;
-                    variableScopes.push(new HashMap<>());
-                    break;
-                case END_BLOCK:
-                    if (blockDepth == 0) {
-                        throw new IllegalStateException("Unmatched closing block: " + line);
-                    }
-                    blockDepth--;
-                    variableScopes.pop();
-                    break;
-                case RETURN_STATEMENT:
-                    // No action needed for return
-                    break;
-                default:
-                    throw new IllegalStateException("Unknown or invalid line: " + line);
-            }
-        }
-
-        if (blockDepth != 0) {
-            throw new IllegalStateException("Unclosed block detected in the method.");
-        }
-    }
-
-    private void validateFunctionCall(String line) {
-        String functionName = line.substring(0, line.indexOf('(')).trim();
-        String arguments = line.substring(line.indexOf('(') + 1, line.lastIndexOf(')')).trim();
-
-        if (!methods.containsKey(functionName)) {
-            throw new IllegalStateException("Function not found: " + functionName);
-        }
-
-        List<Map<String, String>> expectedParams = methods.get(functionName);
-        String[] providedArgs = arguments.isEmpty() ? new String[0] : arguments.split(",");
-
-        if (providedArgs.length != expectedParams.size()) {
-            throw new IllegalStateException("Parameter count mismatch for function: " + functionName);
-        }
-
-        for (int i = 0; i < providedArgs.length; i++) {
-            String providedArg = providedArgs[i].trim();
-            String expectedType = expectedParams.get(i).get("type");
-
-            if (!isValidTypeMatch(providedArg, expectedType)) {
-                throw new IllegalStateException("Type mismatch for parameter " + (i + 1) + " in function: " + functionName);
-            }
-        }
-    }
-
-
-
-    private boolean variableExists(String variableName) {
-        for (Map<String, String> scope : variableScopes) {
-            if (scope.containsKey(variableName)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean isFinalVariable(String variableName) {
-        for (Map<String, String> scope : variableScopes) {
-            if (scope.containsKey(variableName) && "true".equals(scope.get(variableName))) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private void validateVariableDeclaration(String line) {
-        String[] declarations = line.split(",");
-        for (String declaration : declarations) {
-            declaration = declaration.trim();
-            String[] parts = declaration.split("\\s*");
-            String type = parts[0];
-            String name = parts[1];
-
-            if (currentScopeContainsVariable(name)) {
-                throw new IllegalStateException("Variable already declared in current scope: " + name);
+        /**
+         * Validates a single method by performing the following steps:
+         * <ol>
+         *     <li>Opens a new scope and adds method parameters as local variables.</li>
+         *     <li>Parses the method body and categorizes each line.</li>
+         *     <li>Iterates through each line, performing validations based on line type.</li>
+         *     <li>Ensures all opened scopes are properly closed at the end of the method.</li>
+         * </ol>
+         *
+         * @param methodData the {@link MethodData} object representing the method to validate
+         * @throws Exception if any validation step fails, such as unmatched braces or invalid lines
+         */
+        public void validateMethod(MethodData methodData) throws Exception {
+            // 1. Open a new scope for method parameters
+            symbolsTable.openScope();
+            // Add method parameters as local variables
+            for (Variable param : methodData.getMethodParameters()) {
+                symbolsTable.addVariable(param);
+                // Assumes parameters are correctly constructed (name, type, isFinal, isInitialized, etc.)
             }
 
-            variableScopes.peek().put(name, type);
+            // 2. Retrieve the method body and parse line types
+            List<String> body = methodData.getBody();
+            List<MethodParser.LineType> lineTypes = methodParser.parseMethod(body);
+
+            int blockDepth = 1; // Counter for nested blocks
+
+            // 3. Iterate through each line of the method body
+            for (int i = 0; i < body.size(); i++) {
+                String line = body.get(i).trim();
+                MethodParser.LineType lineType = lineTypes.get(i);
+
+                switch (lineType) {
+                    case FUNCTION_CALL:
+                        // 3. Iterate through each line of the method body
+                        functionCallValidator.validateFunctionCall(extractFunctionName(line), extractArguments(line));
+                        break;
+
+                    case CONDITION_START:
+                        // Example line: "if (x > 5) {"
+                        String conditionExpr = extractConditionExpression(line);
+                        conditionValidator.validateCondition(conditionExpr);
+                        //Open a new scope for the condition block
+                        symbolsTable.openScope();
+                        blockDepth++;
+                        break;
+
+                    case END_BLOCK:
+                        // Close the current scope
+                        if (blockDepth == 0) {
+                            throw new Exception("Unmatched closing brace for condition.");
+                        }
+                        symbolsTable.closeScope();
+                        blockDepth--;
+                        break;
+
+                    case VARIABLE_DECLARATION:
+                    case VARIABLE_ASSIGNMENT:
+                        // Handle variable declaration or assignment
+                        variableValidator.handleDeclarationOrAssignment(line);
+                        break;
+                    case RETURN_STATEMENT:
+                        break;
+                    default:
+                        // Unknown or invalid line
+                        throw new Exception("Unknown or invalid line: " + line);
+                }
+            }
+
+            // 4. Ensure all opened blocks are closed
+            if (blockDepth != 0) {
+                throw new Exception("Unclosed block(s) in method: " + methodData.getMethodName());
+            }
+
+        }
+
+
+        // -----------------------------------------------------------
+        // Helper Methods for Extracting Information from Lines
+        // ---------------------------------------------------------
+
+        /**
+         * Extracts the function name from a function call line.
+         *
+         * @param line the line containing the function call
+         * @return the name of the function being called
+         */
+        private String extractFunctionName(String line) {
+            // Assumes MethodParser has already validated the line
+            int idx = line.indexOf('(');
+            if (idx < 0) return line;
+            return line.substring(0, idx).trim();
+        }
+
+
+        /**
+         * Extracts the arguments from a function call line.
+         *
+         * @param line the line containing the function call
+         * @return a string representing the arguments within the parentheses
+         */
+        private String extractArguments(String line) {
+            // Example: "foo(1,2)" -> returns "1,2"
+            int start = line.indexOf("(");
+            int end = line.lastIndexOf(")");
+            if (start < 0 || end < 0 || end <= start) return "";
+            return line.substring(start + 1, end).trim();
+        }
+
+        /**
+         * Extracts the condition expression from a condition start line.
+         *
+         * @param line the line containing the condition (e.g., "if (x > 5) {")
+         * @return the condition expression within the parentheses
+         */
+        private String extractConditionExpression(String line) {
+            // Example: "if (x > 5) {"
+            int open = line.indexOf("(");
+            int close = line.lastIndexOf(")");
+            if (open < 0 || close < 0 || close <= open) {
+                return ""; // Alternatively, throw an exception
+            }
+            return line.substring(open + 1, close).trim();
         }
     }
 
-    private boolean currentScopeContainsVariable(String name) {
-        return variableScopes.peek().containsKey(name);
-    }
-}*/
+
