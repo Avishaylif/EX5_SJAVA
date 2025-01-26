@@ -98,7 +98,8 @@ public class SymbolsTable implements Iterable<Map<String, Variable>> {
     /**
      * Returns an iterator over the scopes in the symbol table.
      *
-     * <p>The iterator traverses the scopes from the most recent (innermost) to the outermost (global) scope.</p>
+     * <p>The iterator traverses the scopes from the most recent
+     * (innermost) to the outermost (global) scope.</p>
      *
      * @return an {@link Iterator} over the scopes
      */
@@ -128,16 +129,33 @@ public class SymbolsTable implements Iterable<Map<String, Variable>> {
     private static class SymbolsTableIterator implements Iterator<Map<String, Variable>> {//todo: erase
         private Iterator<Map<String, Variable>> scopeIterator;
 
+        /**
+         * Constructs a new {@code SymbolsTableIterator} with the specified scopes.
+         *
+         * @param scopes the scopes to iterate over
+         */
         public SymbolsTableIterator(Deque<Map<String, Variable>> scopes) {
             this.scopeIterator = scopes.iterator();
         }
 
+
         @Override
+        /**
+         * Checks if there are more scopes to iterate over.
+         *
+         * @return {@code true} if there are more scopes; {@code false} otherwise
+         */
         public boolean hasNext() {
             return scopeIterator.hasNext();
         }
 
         @Override
+        /**
+         * Retrieves the next scope in the iteration.
+         *
+         * @return the next scope
+         * @throws NoSuchElementException if there are no more scopes to iterate over
+         */
         public Map<String, Variable> next() {
             if (!hasNext()) {
                 throw new NoSuchElementException();

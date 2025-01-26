@@ -4,8 +4,6 @@
     import VariablesManegment.SymbolsTable;
     import VariablesManegment.Variable;
     import VariablesManegment.VariableValidator;
-
-
     import java.util.List;
     import java.util.Map;
 
@@ -114,7 +112,8 @@
                 switch (lineType) {
                     case FUNCTION_CALL:
                         // 3. Iterate through each line of the method body
-                        functionCallValidator.validateFunctionCall(extractFunctionName(line), extractArguments(line));
+                        functionCallValidator.validateFunctionCall(extractFunctionName(line),
+                                extractArguments(line));
                         break;
 
                     case CONDITION_START:

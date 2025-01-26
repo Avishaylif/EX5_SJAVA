@@ -1,12 +1,11 @@
 package parser;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.FileHandler;
+
 
 
 public class SJavaFileParser {
@@ -64,6 +63,10 @@ public class SJavaFileParser {
     private static String deleteEscape(String line) {
         return line.replaceAll("\\s+", " ");    }
 
+    /**
+     * Main method
+     * @param args
+     */
     public static void main(String[] args) {
 
     }

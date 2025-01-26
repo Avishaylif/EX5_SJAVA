@@ -6,7 +6,8 @@ import VariablesManegment.Variable.Type; // נניח שיש Enum של טייפי
 import errors.ValidationException;
 
 /**
- * A validator that checks the validity of a condition in an if/while statement according to the following rules:
+ * A validator that checks the validity
+ * of a condition in an if/while statement according to the following rules:
  *  - A single boolean expression can be:
  *    1) "true" or "false"
  *    2) A boolean or numeric variable (int/double) that is initialized and not null
@@ -36,7 +37,8 @@ public class ConditionValidator {
      * <p>The condition is checked for the following:
      *  - It should not be empty or null.
      *  - It should be split correctly by logical operators (&&, ||).
-     *  - Each sub-condition should be a valid boolean expression, numeric constant, or a valid initialized variable.
+     *  - Each sub-condition should be a valid boolean expression,
+     *  numeric constant, or a valid initialized variable.
      *
      * @param condition The condition string to be validated.
      * @throws ValidationException if the condition is invalid.

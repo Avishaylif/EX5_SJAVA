@@ -1,11 +1,11 @@
 package Methods;
 
 import VariablesManegment.Variable;
-
 import java.util.List;
 /**
  * Represents the data structure for a method, encapsulating its name, parameters, and body.
- * This class is used to store information about a method in a program, including its signature (name and parameters)
+ * This class is used to store information about a method in a program,
+ * including its signature (name and parameters)
  * and the body of the method (its code).
  *
  * <p>It provides getter methods to access the method's name, parameters, and body, which are useful for

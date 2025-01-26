@@ -105,7 +105,8 @@ public class VariableValidator {
     }
 
     /**
-     * Determines whether to declare a new variable or assign a value to an existing one based on the presence of a type.
+     * Determines whether to declare a new variable or assign
+     * a value to an existing one based on the presence of a type.
      *
      * @param typeStr          the type of the variable if it's a declaration; {@code null} otherwise
      * @param isFinal          {@code true} if the variable is final; {@code false} otherwise
@@ -113,7 +114,8 @@ public class VariableValidator {
      * @param resultVariables  the list to which the processed {@link Variable} instances will be added
      * @throws Exception if any declaration or assignment is invalid or causes a conflict
      */
-    private void assignOrDeclareVariables(String typeStr, boolean isFinal, String decl, List<Variable> resultVariables) throws Exception {
+    private void assignOrDeclareVariables
+    (String typeStr, boolean isFinal, String decl, List<Variable> resultVariables) throws Exception {
         decl = decl.trim();
         // Example: decl can be "a = 1" or "b" or "c = a"
 

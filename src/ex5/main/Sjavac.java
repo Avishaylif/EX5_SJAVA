@@ -1,27 +1,34 @@
 package ex5.main;
 
-
 import Conditions.ConditionValidator;
 import Methods.FunctionCallValidator;
 import Methods.MethodData;
 import Methods.MethodValidator;
 import VariablesManegment.SymbolsTable;
-import VariablesManegment.Variable;
 import VariablesManegment.VariableValidator;
 import parser.SJavaFileParser;
-import rules.Variables;
-
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-
 import parser.VariablesAndMethodsParser;
 
+/**
+ * The main class of the Sjavac program.
+ * This class is responsible for parsing the input file, validating the syntax and semantics of the
+ * code, and reporting any errors found.
+ */
 public class Sjavac {
-    private static final String VALID_PATH = "^([a-zA-Z]:\\\\|/)?([^<>:\"|?*\\r\\n]+/)*([^<>:\"|?*\\r\\n]+)?$";
+    private static final String VALID_PATH =
+            "^([a-zA-Z]:\\\\|/)?([^<>:\"|?*\\r\\n]+/)*([^<>:\"|?*\\r\\n]+)?$";
 
-
+    /**
+     * The main method of the Sjavac program.
+     * This method is responsible for parsing the input file, validating the syntax and semantics of the
+     * code, and reporting any errors found.
+     *
+     * @param args The command line arguments passed to the program.
+     * @throws Exception if an error occurs during the parsing or validation of the input file.
+     */
     public static void main(String[] args) throws Exception {
         if (!validFile(args)) {
             System.out.println(1);
@@ -87,7 +94,12 @@ public class Sjavac {
 
          */
 
-
+    /**
+     * Validates the input file path.
+     *
+     * @param sourceFileName The path to the input file.
+     * @return true if the input file path is valid, false otherwise.
+     */
     public static boolean validFile(String[] sourceFileName) {
         if (sourceFileName.length != 1) {
             return false;

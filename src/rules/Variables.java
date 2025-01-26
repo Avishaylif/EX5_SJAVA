@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * A class responsible for validating the syntax and semantics of variables in the S-Java code.
+ */
 public class Variables {
     //constants
 
@@ -22,8 +25,8 @@ public class Variables {
                     "(\\s*,\\s*[a-zA-Z_][a-zA-Z0-9_]*\\s*(=\\s*\"[^\"]*\")*\\s*)*)\\s*;$";
 
     private static final String BOOLEAN_VARIABLE =
-            "^(final\\s*)?(boolean)\\s+([a-zA-Z_][a-zA-Z0-9_]*)(\\s*=\\s*(true|false|[-+]?\\d+(\\.\\d+)?))?" +
-                    "(\\s*,\\s*[a-zA-Z_][a-zA-Z0-9_]*\\s*(=\\s*(true|false|[-+]?\\d+(\\.\\d+)?))?\\s*)*\\s*;$";
+        "^(final\\s*)?(boolean)\\s+([a-zA-Z_][a-zA-Z0-9_]*)(\\s*=\\s*(true|false|[-+]?\\d+(\\.\\d+)?))?" +
+                "(\\s*,\\s*[a-zA-Z_][a-zA-Z0-9_]*\\s*(=\\s*(true|false|[-+]?\\d+(\\.\\d+)?))?\\s*)*\\s*;$";
 
 
     private static final String CHAR_VARIABLE =
@@ -46,7 +49,9 @@ public class Variables {
     private List<String> charVariables = new ArrayList<>();
 
 
-    //Constructor
+   /**
+     * Constructor
+     */
     public Variables() {
     }
 
@@ -228,6 +233,11 @@ public class Variables {
         return true;
     }
 
+    /**
+     * Check if the variables in the file are valid
+     * @param lines
+     * @return true if the variables are valid
+     */
     public boolean hasAssignmentForAllVariables(List<String> lines) {
         for (String line : lines) {
             Pattern pattern = Pattern.compile(VALID_ASSIGMENT);

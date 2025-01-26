@@ -12,19 +12,30 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * A class responsible for parsing global variables and methods from a list of lines.
+ */
 public class VariablesAndMethodsParser {
     // Regular expressions for global variables, method definitions, and blocks
-    private static final String METHOD_DEFINITION = "^void\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*\\((.*?)\\)\\s*\\{\\s*$";//TODO: check
-        private static final String CONDITION_OR_LOOP = "^\\s*(if|while)\\s*\\(.*\\)\\s*\\{\\s*$"; //TODO: check if posiible to be "{" in a new line
+    private static final String METHOD_DEFINITION =
+            "^void\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*\\((.*?)\\)\\s*\\{\\s*$";//TODO: check
+        private static final String CONDITION_OR_LOOP =
+                "^\\s*(if|while)\\s*\\(.*\\)\\s*\\{\\s*$"; //TODO: check if posiible to be "{" in a new line
     private static final String END_BLOCK = "\\s*\\}\\s*$";
-    private static final String PARAMETER_PATTERN = "^(final\\s+)?(int|double|String|boolean|char)\\s+([a-zA-Z_][a-zA-Z0-9_]*)$";
+    private static final String PARAMETER_PATTERN =
+            "^(final\\s+)?(int|double|String|boolean|char)\\s+([a-zA-Z_][a-zA-Z0-9_]*)$";
 
     // Data structures for parsed results
     private final List<String> globalVariables = new ArrayList<>();
     private final Map<String, MethodData> methods = new HashMap<>();
 
 
-    // Parse lines and separate global variables and methods
+    /**
+     * Parses a list of lines to extract global variables and methods.
+     *
+     * @param lines A list of strings, each representing a line of code in the program.
+     * @throws ValidationException if an error occurs during the parsing of the input lines.
+     */
     public void parseLines(List<String> lines) throws ValidationException {
         boolean inMethod = false;
         int blockDepth = 0;
@@ -86,16 +97,30 @@ public class VariablesAndMethodsParser {
         throw new IllegalStateException("Method with no name"); //TODO: throw exception
     }
 
-    // Getters for parsed results
+    /**
+     * Returns the list of global variables parsed from the input lines.
+     *
+     * @return A list of strings, each representing a global variable declaration.
+     */
     public List<String> getGlobalVariables() {
         return globalVariables;
     }
-
+    /**
+     * Returns the map of methods parsed from the input lines.
+     *
+     * @return A map of method names to {@link MethodData} objects.
+     */
     public Map<String, MethodData> getMethods() {
         return methods;
     }
 
-
+    /**
+     * Validates and stores a method definition line.
+     *
+     * @param line A string representing a method definition line.
+     * @return A list of {@link Variable} objects representing the method parameters.
+     * @throws ValidationException if the method definition is invalid.
+     */
     public List<Variable> validateAndStoreMethod(String line) throws ValidationException {
         Pattern pattern = Pattern.compile(METHOD_DEFINITION);
         Matcher matcher = pattern.matcher(line);

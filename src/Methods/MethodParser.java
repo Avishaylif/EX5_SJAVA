@@ -5,7 +5,8 @@ import java.util.List;
 
 /**
  * A parser class that analyzes a list of method lines and classifies them into different types.
- * The class uses regular expressions to identify various elements of a method such as variable declarations, assignments,
+ * The class uses regular expressions to identify various elements of
+ * a method such as variable declarations, assignments,
  * function calls, conditional statements, and return statements.
  *
  * <p>The parser can identify and classify the following types of lines:
@@ -27,12 +28,15 @@ import java.util.List;
 public class MethodParser {
 
     // Regular expressions for line types
-    private static final String VARIABLE_DECLARATION = "^(final\\s+)?(int|double|String|boolean|char)\\s+[a-zA-Z_][a-zA-Z0-9_]*(\\s*=\\s*.+)?;$";
-    private static final String VARIABLE_ASSIGNMENT = "^[a-zA-Z_][a-zA-Z0-9_]*\\s*=\\s*.+;$"; //TODO: check if covers all the options
+    private static final String VARIABLE_DECLARATION =
+            "^(final\\s+)?(int|double|String|boolean|char)\\s+[a-zA-Z_][a-zA-Z0-9_]*(\\s*=\\s*.+)?;$";
+    private static final String VARIABLE_ASSIGNMENT =
+            "^[a-zA-Z_][a-zA-Z0-9_]*\\s*=\\s*.+;$"; //TODO: check if covers all the options
     private static final String FUNCTION_CALL = "^[a-zA-Z][a-zA-Z0-9_]*\\s*\\(.*\\)\\s*;$";
     private static final String CONDITION = "^(if|while)\\s*\\(.*\\)\\s*\\{?$";
     private static final String END_BLOCK = "^\\}\\s*$";
     private static final String RETURN_STATEMENT = "^return;$";
+    private static final int RETURN_STATEMENT_LINE = 2;
 
     /**
      * Enum representing different types of lines that can be encountered in a method.
@@ -59,7 +63,7 @@ public class MethodParser {
         for (int i = 0; i < methodLines.size(); i++) {//without the decleration itself. TODO: magic number
             String line = methodLines.get(i).trim();
 
-            if (i == methodLines.size() - 2 && !line.matches(RETURN_STATEMENT)) {//TODO: magic number
+            if (i == methodLines.size() - RETURN_STATEMENT_LINE && !line.matches(RETURN_STATEMENT)) {
                 throw new IllegalStateException("The second-to-last line must be 'return;': " + line);
             }
 
@@ -71,7 +75,8 @@ public class MethodParser {
     }
 
     /**
-     * Classifies a single line of code into one of the predefined {@link LineType}s based on regular expression matching.
+     * Classifies a single line of code into one of the predefined
+     * {@link LineType}s based on regular expression matching.
      *
      * @param line A single line of code to classify.
      * @return The corresponding {@link LineType} for the given line.
