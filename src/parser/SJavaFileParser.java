@@ -31,6 +31,7 @@ public class SJavaFileParser {
                {lines.add(deleteEscape(line));}
             }
         }
+
         return lines;
     }
 
@@ -43,6 +44,7 @@ public class SJavaFileParser {
         if (line.isEmpty()) return false;
         if (line.startsWith("//")) return false;
         if (line.matches(INVALID_COMMENT)) {
+            System.out.println("1");
             INVALID_LINES++;
             return false;
         }

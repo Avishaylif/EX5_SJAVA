@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 public class VariablesAndMethodsParser {
     // Regular expressions for global variables, method definitions, and blocks
     private static final String METHOD_DEFINITION = "^void\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*\\((.*?)\\)\\s*\\{\\s*$";//TODO: check
-    private static final String CONDITION_OR_LOOP = "^(if|while)\\s*\\(.*\\)\\s*\\{\\s*$"; //TODO: check if posiible to be "{" in a new line
+        private static final String CONDITION_OR_LOOP = "^\\s*(if|while)\\s*\\(.*\\)\\s*\\{\\s*$"; //TODO: check if posiible to be "{" in a new line
     private static final String END_BLOCK = "\\s*\\}\\s*$";
     private static final String PARAMETER_PATTERN = "^(final\\s+)?(int|double|String|boolean|char)\\s+([a-zA-Z_][a-zA-Z0-9_]*)$";
 
@@ -32,7 +32,6 @@ public class VariablesAndMethodsParser {
         List<String> currentMethodLines = new ArrayList<>();
         String methodDefinitionLine = null;
         for (String line : lines) {
-
             if (line.matches(METHOD_DEFINITION)) {
                 if (inMethod) {
                     throw new IllegalStateException("Nested method definitions are not allowed: " + line);
@@ -61,6 +60,7 @@ public class VariablesAndMethodsParser {
                         inMethod = false;
                     }
                 } else {
+
                     throw new IllegalStateException("Unexpected closing block: " + line);
                 }
             } else if (inMethod) {
@@ -69,10 +69,10 @@ public class VariablesAndMethodsParser {
                     globalVariables.add(line);
             }
         }
-
         if (blockDepth != 0) {
             throw new IllegalStateException("Unclosed block detected.");
         }
+
     }
 
     // Extract method name from a method definition line
