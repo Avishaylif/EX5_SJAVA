@@ -343,7 +343,7 @@ public class VariableValidator {
             case BOOLEAN:
                 // Expecting 'true' or 'false'
                 //TODO: handle that!
-                if (!valueStr.equals("true") && !valueStr.equals("false")) {
+                if (!valueStr.matches("^(false|true|[-+]?\\d*\\.?\\d+)$")) {
                     throw new ValidationException("Invalid boolean value: " + valueStr);
                 }
                 return Boolean.parseBoolean(valueStr);
@@ -385,6 +385,14 @@ public class VariableValidator {
         }
         // Allow assigning a double to an int if explicitly allowed todo: check
         if (source == Type.DOUBLE && target == Type.INT) {
+            return true;
+        }
+        // Allow assigning a double to a boolean
+        if (source == Type.DOUBLE && target == Type.BOOLEAN) {
+            return true;
+        }
+        // Allow assigning an int to a boolean
+        if (source == Type.INT && target == Type.BOOLEAN) {
             return true;
         }
         // Extend with additional type compatibility rules as needed todo: check
